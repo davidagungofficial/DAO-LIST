@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+</head>
+<body>
+  <h1>Todo List</h1>
+  <form action="/addTask" method="post">
+    <label for="task">New Task:</label>
+    <input type="text" id="task" name="task" required>
+    <button type="submit">Add Task</button>
+  </form>
+  <ul id="taskList"></ul>
+
+  <script>
+    async function fetchTasks() {
+      const response = await fetch('/getTasks');
+      const tasks = await response.json();
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+
+      tasks.forEach((task, index) => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `${task} <button onclick="removeTask(${index})">Remove</button>`;
+        taskList.appendChild(listItem);
+      });
+    }
+
+    async function removeTask(index) {
+      await fetch('/removeTask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `index=${index}`,
+      });
+      fetchTasks();
+    }
+
+    fetchTasks();
+  </script>
+</body>
+</html>
